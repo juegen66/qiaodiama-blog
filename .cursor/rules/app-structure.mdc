@@ -1,0 +1,25 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# 应用结构
+
+本项目使用Next.js 14的App Router结构。
+
+## 主要页面
+
+- [app/page.tsx](mdc:app/page.tsx) - 首页
+- [app/about/page.tsx](mdc:app/about/page.tsx) - 关于页面
+- [app/blog/page.tsx](mdc:app/blog/page.tsx) - 博客页面
+- [app/docs/page.tsx](mdc:app/docs/page.tsx) - 文档页面
+- [app/pricing/page.tsx](mdc:app/pricing/page.tsx) - 价格页面
+
+## 布局和提供者
+
+- [app/layout.tsx](mdc:app/layout.tsx) - 根布局，包含全局样式和元数据
+- [app/providers.tsx](mdc:app/providers.tsx) - 应用提供者，包含主题提供者等
+
+## 错误处理
+
+- [app/error.tsx](mdc:app/error.tsx) - 错误边界组件

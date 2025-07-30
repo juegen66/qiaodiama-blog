@@ -1,0 +1,25 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# 项目概览
+在windows环境下编程的项目
+这是一个使用Next.js 14（app目录结构）和HeroUI（v2）构建的应用程序模板。
+
+## 主要技术栈
+
+- [Next.js 14](https://nextjs.org/docs/getting-started) - React框架
+- [HeroUI v2](https://heroui.com/) - UI组件库
+- [Tailwind CSS](https://tailwindcss.com/) - CSS框架
+- [TypeScript](https://www.typescriptlang.org/) - 类型系统
+- [Framer Motion](https://www.framer.com/motion/) - 动画库
+- [next-themes](https://github.com/pacocoursey/next-themes) - 主题切换
+
+## 主要文件结构
+
+- [app/layout.tsx](mdc:app/layout.tsx) - 主应用布局
+- [app/page.tsx](mdc:app/page.tsx) - 首页组件
+- [components/navbar.tsx](mdc:components/navbar.tsx) - 导航栏组件
+- [components/sidebar.tsx](mdc:components/sidebar.tsx) - 侧边栏组件
+- [next.config.js](mdc:next.config.js) - Next.js配置
