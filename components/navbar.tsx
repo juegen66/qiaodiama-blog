@@ -55,7 +55,7 @@ export const Navbar = () => {
   const searchInput = (
     <form onSubmit={handleSearch} className="w-full relative">
       <Input
-        aria-label="Search"
+        aria-label="搜索"
         classNames={{
           inputWrapper: "bg-default-100",
           input: "text-sm pr-20",
@@ -120,7 +120,7 @@ export const Navbar = () => {
         justify="end"
       >
         <NavbarItem className="hidden sm:flex gap-2">
-          <Link isExternal aria-label="Github" href={siteConfig.links.github}>
+          <Link isExternal aria-label="GitHub 链接" href={siteConfig.links.github}>
             <GithubIcon className="text-default-500" />
           </Link>
           <ThemeSwitch />
@@ -135,13 +135,13 @@ export const Navbar = () => {
             startContent={<HeartFilledIcon className="text-danger" />}
             variant="flat"
           >
-            Sponsor
+            赞助
           </Button>
         </NavbarItem>
       </NavbarContent>
 
       <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
-        <Link isExternal aria-label="Github" href={siteConfig.links.github}>
+        <Link isExternal aria-label="GitHub 链接" href={siteConfig.links.github}>
           <GithubIcon className="text-default-500" />
         </Link>
         <ThemeSwitch />
@@ -151,19 +151,9 @@ export const Navbar = () => {
       <NavbarMenu>
         {searchInput}
         <div className="mx-4 mt-2 flex flex-col gap-2">
-          {siteConfig.navMenuItems.map((item, index) => (
-            <NavbarMenuItem key={`${item}-${index}`}>
-              <Link
-                color={
-                  index === 2
-                    ? "primary"
-                    : index === siteConfig.navMenuItems.length - 1
-                      ? "danger"
-                      : "foreground"
-                }
-                href="#"
-                size="lg"
-              >
+          {siteConfig.navItems.map((item) => (
+            <NavbarMenuItem key={item.href}>
+              <Link as={NextLink} href={item.href} size="lg" color="foreground">
                 {item.label}
               </Link>
             </NavbarMenuItem>

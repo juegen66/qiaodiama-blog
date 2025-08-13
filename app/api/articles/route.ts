@@ -8,18 +8,28 @@ export async function GET(request: NextRequest) {
 
     // 从URL参数中获取查询条件
     const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
     const page = parseInt(searchParams.get('page') || '1');
     const pageSize = parseInt(searchParams.get('page_size') || '10');
     const categoryId = searchParams.get('category_id');
+    const categoryName = searchParams.get('category_name');
     const tagId = searchParams.get('tag_id');
+    const tagName = searchParams.get('tag_name');
     const userId = searchParams.get('user_id');
     const search = searchParams.get('search');
     const status = searchParams.get('status');
+    const excludeCategoryName = searchParams.get('exclude_category_name');
+    const excludeTagName = searchParams.get('exclude_tag_name');
 
     // 构建WHERE条件
     const conditions: string[] = [];
     const params: any[] = [];
     let paramIndex = 1;
+
+    if (id) {
+      conditions.push(`p.id = $${paramIndex++}`);
+      params.push(parseInt(id));
+    }
 
     if (categoryId) {
       conditions.push(`p.category_id = $${paramIndex++}`);
@@ -41,12 +51,48 @@ export async function GET(request: NextRequest) {
       params.push(`%${search}%`, `%${search}%`);
     }
 
-    // 如果有标签筛选，需要JOIN post_tag表
+    // 处理标签/分类的附加筛选
     let joinClause = '';
+    const joinParts: string[] = [];
+
+    if (tagId || tagName) {
+      joinParts.push('INNER JOIN post_tag pt ON p.id = pt.post_id');
+    }
+    if (tagName) {
+      joinParts.push('INNER JOIN tag t ON pt.tag_id = t.id');
+    }
+
     if (tagId) {
-      joinClause = 'INNER JOIN post_tag pt ON p.id = pt.post_id';
       conditions.push(`pt.tag_id = $${paramIndex++}`);
       params.push(parseInt(tagId));
+    }
+
+    if (tagName) {
+      conditions.push(`t.name = $${paramIndex++}`);
+      params.push(tagName);
+    }
+
+    if (categoryName) {
+      conditions.push(`c.name = $${paramIndex++}`);
+      params.push(categoryName);
+    }
+
+    if (excludeCategoryName) {
+      conditions.push(`c.name <> $${paramIndex++}`);
+      params.push(excludeCategoryName);
+    }
+
+    if (excludeTagName) {
+      conditions.push(`NOT EXISTS (
+        SELECT 1 FROM post_tag pt2
+        INNER JOIN tag t2 ON pt2.tag_id = t2.id
+        WHERE pt2.post_id = p.id AND t2.name = $${paramIndex++}
+      )`);
+      params.push(excludeTagName);
+    }
+
+    if (joinParts.length > 0) {
+      joinClause = joinParts.join('\n');
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';

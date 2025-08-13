@@ -54,6 +54,18 @@ export const ArticlePage: React.FC<ArticleProps> = ({ article, onBack }) => {
         // 创建内容容器
         const container = document.createElement('div');
         container.innerHTML = article.content;
+
+        // 处理正文中的图片路径为静态资源 URL（仅处理非 http(s)/data 的相对路径）
+        const imgNodes = Array.from(container.querySelectorAll('img')) as HTMLImageElement[];
+        imgNodes.forEach((img) => {
+          const srcAttr = img.getAttribute('src') || '';
+          const lower = srcAttr.toLowerCase();
+          const isExternal = lower.startsWith('http://') || lower.startsWith('https://') || lower.startsWith('data:');
+          if (!isExternal && srcAttr) {
+            const resolved = getStaticUrl(srcAttr);
+            if (resolved) img.setAttribute('src', resolved);
+          }
+        });
         
         // 添加样式和内容到shadow root
         shadowRoot.appendChild(style);
@@ -63,6 +75,16 @@ export const ArticlePage: React.FC<ArticleProps> = ({ article, onBack }) => {
         const container = contentRef.current.shadowRoot.querySelector('div');
         if (container) {
           container.innerHTML = article.content;
+          const imgNodes = Array.from(container.querySelectorAll('img')) as HTMLImageElement[];
+          imgNodes.forEach((img) => {
+            const srcAttr = img.getAttribute('src') || '';
+            const lower = srcAttr.toLowerCase();
+            const isExternal = lower.startsWith('http://') || lower.startsWith('https://') || lower.startsWith('data:');
+            if (!isExternal && srcAttr) {
+              const resolved = getStaticUrl(srcAttr);
+              if (resolved) img.setAttribute('src', resolved);
+            }
+          });
         }
       }
     }

@@ -28,13 +28,18 @@ export interface Post {
 
 // 文章列表查询参数
 interface PostListQueryParams {
+  id?: number;
   page?: number;
   page_size?: number;
   status?: number;
   category_id?: number;
+  category_name?: string;
   tag_id?: number;
+  tag_name?: string;
   user_id?: number;
   search?: string;
+  exclude_category_name?: string;
+  exclude_tag_name?: string;
 }
 
 // 标签接口类型
@@ -68,13 +73,18 @@ export const createCategory = async (data: { name: string; description?: string 
  */
 export const getPostList = async (params: PostListQueryParams = {}): Promise<ApiResponse<PaginationResponse<Post>> | undefined> => {
   const queryParams = {
+    id: params.id,
     page: params.page || 1,
     page_size: params.page_size || 10,
     category_id: params.category_id,
+    category_name: params.category_name,
     tag_id: params.tag_id,
+    tag_name: params.tag_name,
     user_id: params.user_id,
     search: params.search,
-    status: params.status
+    status: params.status,
+    exclude_category_name: params.exclude_category_name,
+    exclude_tag_name: params.exclude_tag_name
   };
 
   return await apiFetch<PaginationResponse<Post>>('/api/articles', {

@@ -1,17 +1,56 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { Card, CardBody, Link, Avatar } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { getTagSimpleList, getCategoryList, Tag, Category } from "../api/article";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const socialLinks = [
   { icon: "logos:github-icon", label: "GitHub", url: "https://github.com/juegen666" },
 ];
 
-export const Sidebar = () => {
+interface SidebarProps {
+  hideCategoryNames?: string[];
+  hideTagNames?: string[];
+  basePath?: string; // 用于控制导航目标（默认跳到 /blog）
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({
+  hideCategoryNames = [],
+  hideTagNames = [],
+  basePath = "/blog",
+}) => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [tags, setTags] = useState<Tag[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loadingTags, setLoadingTags] = useState(true);
   const [loadingCategories, setLoadingCategories] = useState(true);
+
+  const handleNavigate = (type: "tag" | "category", id: number) => {
+    const params = new URLSearchParams(searchParams?.toString() || "");
+    // 重置其他筛选 & 分页
+    params.delete("id");
+    params.delete("page");
+    if (type === "tag") {
+      params.delete("category");
+    } else {
+      params.delete("tag");
+    }
+
+    const current = searchParams?.get(type);
+    params.set(type, String(id));
+
+    // 如果点击的是同一个筛选，强制刷新一次
+    if (current === String(id)) {
+      params.set("_r", Date.now().toString());
+    } else {
+      params.delete("_r");
+    }
+
+    router.push(`${basePath}?${params.toString()}`);
+  };
 
   useEffect(() => {
     const fetchTags = async () => {
@@ -36,11 +75,13 @@ export const Sidebar = () => {
         const response = await getCategoryList();
         if (response && response.code === 200 && response.data) {
           // 转换数据格式以兼容旧的接口
-          const categoriesData = response.data.map(cat => ({
+          const categoriesData = response.data
+            .filter(cat => !hideCategoryNames?.includes(cat.name))
+            .map(cat => ({
             id: cat.id,
             name: cat.name,
             article_count: cat._count?.posts || 0
-          }));
+            }));
           setCategories(categoriesData);
         }
       } catch (error) {
@@ -87,23 +128,35 @@ export const Sidebar = () => {
             {loadingCategories ? (
               <p className="text-default-500 text-sm">加载中...</p>
             ) : categories.length > 0 ? (
-              categories.map((category) => (
-                <div
-                  key={category.id}
-                  className="flex items-center justify-between group"
-                >
-                  <Link
-                    href={`/blog?category=${category.id}`}
-                    color="foreground"
-                    className="hover:text-primary transition-colors text-sm"
+              categories.map((category) => {
+                const isLife = category.name === "生活";
+                const linkHref = isLife ? "/life" : `${basePath}?category=${category.id}`;
+                return (
+                  <div
+                    key={category.id}
+                    className="flex items-center justify-between group"
                   >
-                    {category.name}
-                  </Link>
-                  <span className="text-default-500 text-xs">
-                    {category.article_count}
-                  </span>
-                </div>
-              ))
+                    <Link
+                      href={linkHref}
+                      color="foreground"
+                      className="hover:text-primary transition-colors text-sm"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (isLife) {
+                          router.push("/life");
+                        } else {
+                          handleNavigate("category", category.id);
+                        }
+                      }}
+                    >
+                      {category.name}
+                    </Link>
+                    <span className="text-default-500 text-xs">
+                      {category.article_count}
+                    </span>
+                  </div>
+                );
+              })
             ) : (
               <p className="text-default-500 text-sm">暂无分类</p>
             )}
@@ -118,19 +171,33 @@ export const Sidebar = () => {
           <div className="flex flex-wrap gap-2">
             {loadingTags ? (
               <p className="text-default-500 text-sm">加载中...</p>
-            ) : tags.length > 0 ? (
-              tags.map((tag) => (
-                <Link
-                  key={tag.id}
-                  href={`/blog?tag=${tag.id}`}
-                  className="flex items-center gap-1 px-3 py-1 border border-default-200 rounded-full bg-default-50 hover:bg-primary/10 hover:border-primary text-xs font-medium text-default-700 hover:text-primary transition-colors shadow-sm"
-                  style={{ lineHeight: '1.8' }}
-                >
-                  <Icon icon="mdi:tag-outline" className="text-base opacity-70" />
-                  {tag.name}
-                  <span className="ml-1 text-default-400">({tag.article_count})</span>
-                </Link>
-              ))
+             ) : tags.length > 0 ? (
+              tags
+                .filter(tag => !hideTagNames?.includes(tag.name))
+                .map((tag) => {
+                  const isLife = tag.name === "生活";
+                  const linkHref = isLife ? "/life" : `${basePath}?tag=${tag.id}`;
+                  return (
+                    <Link
+                      key={tag.id}
+                      href={linkHref}
+                      className="flex items-center gap-1 px-3 py-1 border border-default-200 rounded-full bg-default-50 hover:bg-primary/10 hover:border-primary text-xs font-medium text-default-700 hover:text-primary transition-colors shadow-sm"
+                      style={{ lineHeight: '1.8' }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (isLife) {
+                          router.push("/life");
+                        } else {
+                          handleNavigate("tag", tag.id);
+                        }
+                      }}
+                    >
+                      <Icon icon="mdi:tag-outline" className="text-base opacity-70" />
+                      {tag.name}
+                      <span className="ml-1 text-default-400">({tag.article_count})</span>
+                    </Link>
+                  );
+                })
             ) : (
               <p className="text-default-500 text-sm">暂无标签</p>
             )}

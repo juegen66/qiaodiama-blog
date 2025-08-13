@@ -40,7 +40,7 @@ export const BlogPost: React.FC<BlogPostProps> = ({ post }) => {
             
             <h2 className="text-xl font-semibold mb-2">
               <Link 
-                href={`/post/${post.id}`}
+                href={`/blog?id=${post.id}`}
                 color="foreground"
                 className="hover:text-primary transition-colors"
               >

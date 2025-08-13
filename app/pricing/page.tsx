@@ -1,127 +1,51 @@
 "use client";
-import { useState } from "react";
-import { title } from "@/components/primitives";
-import { Card, Button } from "@heroui/react";
+import { Image } from "@heroui/react";
+import clsx from "clsx";
+import { title, subtitle } from "@/components/primitives";
+import { products } from "@/config/products";
 
-// 文章类型定义
-interface Article {
-  id: number;
-  title: string;
-  content: string;
-  summary: string;
-}
+const imageHeights = ["h-56", "h-72", "h-64", "h-80", "h-60"];
+const rotations = ["rotate-0", "-rotate-1", "rotate-1", "-rotate-2", "rotate-2"];
 
-// 模拟文章数据
-const articles: Article[] = [
-  {
-    id: 1,
-    title: "React 入门教程",
-    content: "这是一篇关于 React 基础的文章...",
-    summary: "学习 React 的基础知识"
-  },
-  {
-    id: 2,
-    title: "TypeScript 实战",
-    content: "TypeScript 让你的代码更安全...",
-    summary: "深入理解 TypeScript"
-  },
-  {
-    id: 3,
-    title: "Next.js 13 新特性",
-    content: "App Router 带来了全新的开发体验...",
-    summary: "探索 Next.js 13 的新功能"
-  }
-];
-
-// 组件 Props 类型定义
-interface ArticleListProps {
-  onArticleClick: (id: number) => void;
-}
-
-interface ArticleDetailProps {
-  article: Article;
-  onBack: () => void;
-}
-
-// 文章列表组件
-const ArticleList = ({ onArticleClick }: ArticleListProps) => {
+export default function ProductsPage() {
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-bold mb-4">文章列表</h2>
-      {articles.map((article) => (
-        <Card 
-          key={article.id}
-          className="p-4 cursor-pointer hover:bg-gray-100"
-          onClick={() => onArticleClick(article.id)}
-        >
-          <h3 className="font-semibold">{article.title}</h3>
-          <p className="text-gray-600">{article.summary}</p>
-        </Card>
-      ))}
-    </div>
-  );
-};
+    <div className="w-full relative">
+      <div className="text-center mb-10">
+        <h1 className={title({ className: "mb-3" })}>产品展示</h1>
+        <p className={subtitle({ fullWidth: true })}>点击卡片直接访问对应站点</p>
+      </div>
 
-// 文章详情组件
-const ArticleDetail = ({ article, onBack }: ArticleDetailProps) => {
-  if (!article) return null;
-
-  return (
-    <div className="space-y-4">
-      <Button 
-        color="primary" 
-        variant="light"
-        onClick={onBack}
-      >
-        返回列表
-      </Button>
-      <h2 className="text-2xl font-bold">{article.title}</h2>
-      <p className="text-gray-700">{article.content}</p>
-    </div>
-  );
-};
-
-export default function PricingPage() {
-  // 状态：当前选中的文章ID
-  const [selectedArticleId, setSelectedArticleId] = useState<number | null>(null);
-
-  // 根据ID查找文章
-  const selectedArticle = selectedArticleId 
-    ? articles.find(article => article.id === selectedArticleId)
-    : null;
-
-  // 处理文章点击
-  const handleArticleClick = (articleId: number) => {
-    console.log('点击了文章:', articleId);
-    setSelectedArticleId(articleId);
-  };
-
-  // 处理返回列表
-  const handleBack = () => {
-    setSelectedArticleId(null);
-  };
-
-  return (
-    <div className="max-w-4xl mx-auto p-4">
-      <h1 className={title({ className: "mb-8" })}>文章列表与详情演示</h1>
-      
-      {/* 根据是否选中文章来决定显示列表还是详情 */}
-      {selectedArticle ? (
-        <ArticleDetail 
-          article={selectedArticle} 
-          onBack={handleBack}
-        />
-      ) : (
-        <ArticleList 
-          onArticleClick={handleArticleClick}
-        />
-      )}
-
-      {/* 调试信息 */}
-      <div className="mt-8 p-4 bg-gray-100 rounded">
-        <h3 className="font-bold">调试信息：</h3>
-        <p>当前选中的文章ID: {selectedArticleId || '无'}</p>
-        <p>是否找到对应文章: {selectedArticle ? '是' : '否'}</p>
+      <div className="columns-1 sm:columns-2 lg:columns-3 gap-6">
+        {products.map((product, idx) => (
+          <a
+            key={product.id}
+            href={product.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group block mb-6 break-inside-avoid"
+          >
+            <div
+              className={clsx(
+                "relative overflow-hidden rounded-2xl border bg-white/60 dark:bg-white/5 border-zinc-200 dark:border-white/10",
+                "transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/10 dark:hover:shadow-white/5",
+                rotations[idx % rotations.length]
+              )}
+            >
+              <div className={clsx("w-full", imageHeights[idx % imageHeights.length])}>
+                <Image
+                  removeWrapper
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  src={product.cover}
+                  alt={product.name}
+                />
+              </div>
+              <div className="p-5">
+                <h3 className="text-lg font-semibold tracking-tight">{product.name}</h3>
+                <p className="mt-1 text-sm text-default-500">{product.description}</p>
+              </div>
+            </div>
+          </a>
+        ))}
       </div>
     </div>
   );
