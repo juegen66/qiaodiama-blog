@@ -50,7 +50,7 @@ export default function Home() {
         </section>
         <section className="flex flex-col items-center justify-center gap-4 mt-[30px]">
           <p className={`${subtitle()} text-center`}>
-            欢迎来到敲呆马的博客站
+            欢迎来到敲呆弄的博客站
           </p>
 
           <div className="flex gap-3 mt-4">
@@ -64,7 +64,7 @@ export default function Home() {
             >
               浏览文章
             </Link>
-            <Link
+            <Link 
               isExternal
               className={buttonStyles({ color: "primary", variant: "bordered", radius: "full" })}
               href={siteConfig.links.github}

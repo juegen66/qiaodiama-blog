@@ -14,6 +14,7 @@ export const HomeCarousel: React.FC = () => {
   const [items, setItems] = useState<CarouselItem[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
     const fetchLatest = async () => {
@@ -38,16 +39,19 @@ export const HomeCarousel: React.FC = () => {
     if (items.length <= 1) return;
     const timer = setInterval(() => {
       setActiveIndex((idx) => (idx + 1) % items.length);
+      setImageLoaded(false); // 重置图片加载状态
     }, 5000);
     return () => clearInterval(timer);
   }, [items.length]);
 
   const goPrev = () => {
     setActiveIndex((idx) => (idx - 1 + items.length) % items.length);
+    setImageLoaded(false);
   };
 
   const goNext = () => {
     setActiveIndex((idx) => (idx + 1) % items.length);
+    setImageLoaded(false);
   };
 
   const handleClick = (postId: number) => {
@@ -94,10 +98,12 @@ export const HomeCarousel: React.FC = () => {
           className="object-cover w-full h-full"
           src={getStaticUrl(current.cover_image) || undefined}
           alt={current.title}
+          onLoad={() => setImageLoaded(true)}
+          onError={() => setImageLoaded(true)}
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 z-10">
           <h3 className="text-white text-lg sm:text-2xl font-semibold line-clamp-2">
             {current.title}
           </h3>

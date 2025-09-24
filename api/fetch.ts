@@ -70,11 +70,12 @@ export const apiFetch = async <T = any>(
       console.error("API请求错误:", fullUrl, response.status, data);
 
       // 如果后端返回了错误信息，使用后端的错误信息
-      if (data && data.message) {
-        alert(`请求失败: ${data.message}`);
-      } else {
-        alert(`请求失败: HTTP ${response.status}`);
-      }
+      // if (data && data.message) {
+      //   alert(`请求失败: ${data.message}`);
+      // } else {
+      //   alert(`请求失败: HTTP ${response.status}`);
+      // }
+      alert(`请求失败`);
 
       return undefined;
     }
@@ -83,11 +84,11 @@ export const apiFetch = async <T = any>(
   } catch (error) {
     // Handle network or unknown errors, including timeout
     if (error instanceof Error) {
-      if (error.name === "AbortError") {
-        alert("请求超时：请检查网络后重试");
-      } else if (!error.message.includes("请求失败")) {
-        alert("网络错误：网络连接异常，请检查网络后重试");
-      }
+      // if (error.name === "AbortError") {
+      //   alert("请求超时：请检查网络后重试");
+      // } else if (!error.message.includes("请求失败")) {
+      //   alert("网络错误：网络连接异常，请检查网络后重试");
+      // }
       console.error("请求异常:", error);
     }
     return undefined;
